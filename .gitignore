@@ -15,3 +15,5 @@
 
 # JetBrains IDE
 .idea/
+
+config.json
