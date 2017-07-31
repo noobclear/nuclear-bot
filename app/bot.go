@@ -1,14 +1,14 @@
 package app
 
 import (
+	"bufio"
 	"net"
 	"net/textproto"
-	"bufio"
 	"strings"
 )
 
 const (
-	CRLF       = "\r\n"
+	CRLF = "\r\n"
 )
 
 type Bot struct {
