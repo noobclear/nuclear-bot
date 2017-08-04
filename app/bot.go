@@ -16,16 +16,7 @@ type Bot struct {
 }
 
 func (b *Bot) Start() {
-	conn, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
-
-	if err != nil {
-		panic(err)
-	}
-
-	// token, username, and channel
-	conn.Write([]byte("PASS " + b.BotConfig.TwitchOAuthToken + CRLF))
-	conn.Write([]byte("NICK " + b.BotConfig.BotUsername + CRLF))
-	conn.Write([]byte("JOIN " + b.BotConfig.TargetChannel + CRLF))
+	conn := b.GetConnection()
 	defer conn.Close()
 
 	tp := textproto.NewReader(bufio.NewReader(conn))
@@ -48,4 +39,18 @@ func (b *Bot) Start() {
 			conn.Write([]byte("PRIVMSG " + msgParts[2] + " " + msgParts[3] + "\r\n"))
 		}
 	}
+}
+
+func (b *Bot) GetConnection() net.Conn {
+	conn, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
+
+	if err != nil {
+		panic(err)
+	}
+
+	// token, username, and channel
+	conn.Write([]byte("PASS " + b.BotConfig.TwitchOAuthToken + CRLF))
+	conn.Write([]byte("NICK " + b.BotConfig.BotUsername + CRLF))
+	conn.Write([]byte("JOIN " + b.BotConfig.TargetChannel + CRLF))
+	return &conn
 }
