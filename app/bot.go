@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"net"
 	"net/textproto"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -31,6 +32,8 @@ func (b *Bot) Start() {
 		if err != nil {
 			panic(err)
 		}
+
+		logrus.Infof("> %s", msg)
 		b.Responder.Respond(msg, ctx)
 	}
 }
@@ -46,5 +49,7 @@ func (b *Bot) GetConnection() net.Conn {
 	conn.Write([]byte("PASS " + b.BotConfig.TwitchOAuthToken + CRLF))
 	conn.Write([]byte("NICK " + b.BotConfig.BotUsername + CRLF))
 	conn.Write([]byte("JOIN " + b.BotConfig.TargetChannel + CRLF))
+
+	logrus.Infof("%s joined %s", b.BotUsername, b.TargetChannel)
 	return conn
 }
