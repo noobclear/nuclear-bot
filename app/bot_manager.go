@@ -4,8 +4,12 @@ import (
 	"sync"
 )
 
+type Manager interface {
+	StartAll()
+}
+
 type BotManager struct {
-	Bots []Bot
+	Bots []Starter
 }
 
 func (bm *BotManager) StartAll() {
@@ -17,11 +21,11 @@ func (bm *BotManager) StartAll() {
 	wg.Wait()
 }
 
-func NewBotManager(c *Config) *BotManager {
-	var bots []Bot
+func NewBotManager(c *Config) Manager {
+	var bots []Starter
 	for _, bc := range c.BotConfigs {
-		bot := Bot{bc}
-		bots = append(bots, bot)
+		bot := Bot{bc, NewMessageResponder()}
+		bots = append(bots, &bot)
 	}
 	return &BotManager{bots}
 }

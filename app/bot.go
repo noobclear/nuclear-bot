@@ -4,15 +4,19 @@ import (
 	"bufio"
 	"net"
 	"net/textproto"
-	"strings"
 )
 
 const (
 	CRLF = "\r\n"
 )
 
+type Starter interface {
+	Start()
+}
+
 type Bot struct {
 	BotConfig
+	Responder
 }
 
 func (b *Bot) Start() {
@@ -20,24 +24,14 @@ func (b *Bot) Start() {
 	defer conn.Close()
 
 	tp := textproto.NewReader(bufio.NewReader(conn))
+	ctx := Context{conn}
 
 	for {
 		msg, err := tp.ReadLine()
 		if err != nil {
 			panic(err)
 		}
-
-		// i.e. ":username@username.tmi.twitch.tv PRIVMSG #channel :chatmessage"
-		msgParts := strings.Split(msg, " ")
-
-		if msgParts[0] == "PING" {
-			conn.Write([]byte("PONG " + msgParts[1]))
-			continue
-		}
-
-		if msgParts[1] == "PRIVMSG" {
-			conn.Write([]byte("PRIVMSG " + msgParts[2] + " " + msgParts[3] + "\r\n"))
-		}
+		b.Responder.Respond(msg, ctx)
 	}
 }
 
