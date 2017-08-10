@@ -1,0 +1,4 @@
+package: github.com/noobclear/nuclear-bot
+import:
+- package: github.com/sirupsen/logrus
+  version: ^1.0.2
