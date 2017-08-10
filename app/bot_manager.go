@@ -1,6 +1,8 @@
 package app
 
-import "sync"
+import (
+	"sync"
+)
 
 type BotManager struct {
 	Bots []Bot

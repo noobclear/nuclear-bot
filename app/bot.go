@@ -52,5 +52,5 @@ func (b *Bot) GetConnection() net.Conn {
 	conn.Write([]byte("PASS " + b.BotConfig.TwitchOAuthToken + CRLF))
 	conn.Write([]byte("NICK " + b.BotConfig.BotUsername + CRLF))
 	conn.Write([]byte("JOIN " + b.BotConfig.TargetChannel + CRLF))
-	return &conn
+	return conn
 }
