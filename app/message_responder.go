@@ -15,12 +15,12 @@ func (mh *MessageResponder) Respond(msg string, ctx Context) {
 	msgParts := strings.Split(msg, " ")
 
 	if msgParts[0] == "PING" {
-		ctx.Connection.Write([]byte("PONG " + msgParts[1]))
+		ctx.Connection.Write([]byte("PONG " + msgParts[1] + CRLF))
 		return
 	}
 
 	if msgParts[1] == "PRIVMSG" {
-		ctx.Connection.Write([]byte("PRIVMSG " + msgParts[2] + " " + msgParts[3] + "\r\n"))
+		ctx.Connection.Write([]byte("PRIVMSG " + msgParts[2] + " " + msgParts[3] + CRLF))
 	}
 }
 
