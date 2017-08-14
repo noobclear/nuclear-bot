@@ -4,7 +4,7 @@ import (
 	"github.com/noobclear/nuclear-bot/app/messages"
 )
 
-type PrivMsgHandler struct {}
+type PrivMsgHandler struct{}
 
 func (pmh *PrivMsgHandler) Handle(ctx *messages.Context, m messages.Message) (string, bool, error) {
 	privMessage, ok := m.(*messages.PrivMessage)

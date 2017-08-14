@@ -1,8 +1,8 @@
 package app
 
 import (
-	"sync"
 	"github.com/noobclear/nuclear-bot/app/config"
+	"sync"
 )
 
 type Manager interface {

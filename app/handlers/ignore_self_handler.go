@@ -4,7 +4,7 @@ import (
 	"github.com/noobclear/nuclear-bot/app/messages"
 )
 
-type IgnoreSelfHandler struct {}
+type IgnoreSelfHandler struct{}
 
 // Filters out messages from other instances of the same bot to avoid recursive messaging behavior
 func (ish *IgnoreSelfHandler) Handle(ctx *messages.Context, m messages.Message) (string, bool, error) {

@@ -1,20 +1,20 @@
 package messages
 
 import (
-	"strings"
 	"github.com/sirupsen/logrus"
+	"strings"
 )
 
-type Message interface {}
+type Message interface{}
 
 type PingMessage struct {
 	Host string
 }
 
 type PrivMessage struct {
-	FromUser string
+	FromUser  string
 	ToChannel string
-	Text string
+	Text      string
 }
 
 func NewMessage(msg string) Message {
@@ -29,7 +29,7 @@ func NewMessage(msg string) Message {
 			FromUser: msgParts[0][1:strings.Index(msgParts[0], "!")],
 			// i.e. Extract "#nuclear"
 			ToChannel: msgParts[2],
-			Text: strings.SplitN(msg, ":", 3)[2],
+			Text:      strings.SplitN(msg, ":", 3)[2],
 		}
 	}
 

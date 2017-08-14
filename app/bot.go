@@ -2,12 +2,12 @@ package app
 
 import (
 	"bufio"
+	"github.com/noobclear/nuclear-bot/app/config"
+	"github.com/noobclear/nuclear-bot/app/messages"
+	"github.com/noobclear/nuclear-bot/app/util"
+	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
-	"github.com/sirupsen/logrus"
-	"github.com/noobclear/nuclear-bot/app/util"
-	"github.com/noobclear/nuclear-bot/app/messages"
-	"github.com/noobclear/nuclear-bot/app/config"
 )
 
 type Starter interface {
@@ -25,13 +25,13 @@ func (b *Bot) Start() {
 
 	r := textproto.NewReader(bufio.NewReader(conn))
 	ctx := messages.Context{
-		Connection: conn,
-		BotUsername: b.Config.BotUsername,
+		Connection:    conn,
+		BotUsername:   b.Config.BotUsername,
 		TargetChannel: b.Config.TargetChannel,
 	}
 
 	// Create a rate limited channel for bot responses
-	messageQueue := make(chan string, b.Config.RateLimit * 2)
+	messageQueue := make(chan string, b.Config.RateLimit*2)
 	go func(q <-chan string) {
 		for s := range q {
 			logrus.Infof("> [%s]", s)

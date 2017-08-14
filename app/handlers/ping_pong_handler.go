@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"github.com/noobclear/nuclear-bot/app/messages"
 	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/sirupsen/logrus"
-	"github.com/noobclear/nuclear-bot/app/messages"
 )
 
-type PingPongHandler struct {}
+type PingPongHandler struct{}
 
 func (pph *PingPongHandler) Handle(ctx *messages.Context, m messages.Message) (string, bool, error) {
 	pingMessage, ok := m.(*messages.PingMessage)
