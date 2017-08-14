@@ -2,7 +2,7 @@ package app
 
 import (
 	"sync"
-	"github.com/noobclear/nuclear-bot/app/messages"
+	"github.com/noobclear/nuclear-bot/app/config"
 )
 
 type Manager interface {
@@ -22,10 +22,10 @@ func (bm *BotManager) StartAll() {
 	wg.Wait()
 }
 
-func NewBotManager(c *Config) Manager {
+func NewBotManager(c *config.Config) Manager {
 	var bots []Starter
 	for _, bc := range c.BotConfigs {
-		bot := Bot{bc, messages.NewMessageResponder()}
+		bot := Bot{bc, NewMessageRouter()}
 		bots = append(bots, &bot)
 	}
 	return &BotManager{bots}

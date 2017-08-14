@@ -1,9 +1,12 @@
 package main
 
-import "github.com/noobclear/nuclear-bot/app"
+import (
+	"github.com/noobclear/nuclear-bot/app"
+	"github.com/noobclear/nuclear-bot/app/config"
+)
 
 func main() {
-	conf := app.GetConfig()
+	conf := config.GetConfig()
 	bm := app.NewBotManager(conf)
 	bm.StartAll()
 }

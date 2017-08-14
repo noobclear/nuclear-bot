@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/noobclear/nuclear-bot/app/messages"
+	"github.com/noobclear/nuclear-bot/app/config"
 )
 
 type Starter interface {
@@ -14,8 +15,8 @@ type Starter interface {
 }
 
 type Bot struct {
-	BotConfig
-	messages.Responder
+	config.BotConfig
+	Router
 }
 
 func (b *Bot) Start() {
@@ -55,7 +56,7 @@ func (b *Bot) listen(ctx *messages.Context, r *textproto.Reader) {
 			panic(err)
 		}
 
-		logrus.Infof("> %s", msg)
-		b.Responder.Respond(msg, ctx)
+		logrus.Infof("< %s", msg)
+		b.Router.Route(msg, ctx)
 	}
 }

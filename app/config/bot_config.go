@@ -1,4 +1,4 @@
-package app
+package config
 
 type BotConfig struct {
 	TwitchOAuthToken string `json:"twitch_oauth_token"`
