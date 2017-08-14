@@ -8,6 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
+	"github.com/beefsack/go-rate"
+	"time"
 )
 
 type Starter interface {
@@ -30,11 +32,23 @@ func (b *Bot) Start() {
 		TargetChannel: b.Config.TargetChannel,
 	}
 
-	// Create a rate limited channel for bot responses
-	messageQueue := make(chan string, b.Config.RateLimit*2)
+	// TODO: Refactor out this rate limited channel
+	// Rate limit the channel for bot responses
+	limiter := rate.New(b.Config.RateLimit, 30 * time.Second)
+	messageQueue := make(chan string, b.Config.RateLimit)
+	var count int
+
 	go func(q <-chan string) {
 		for s := range q {
-			logrus.Infof("> [%s]", s)
+			count++
+			ok, remaining := limiter.Try()
+			// Throw away response if user has to wait too long
+			if !ok {
+				logrus.Warnf("Rate limited skip: [%s], remaining: %v", s, remaining)
+				continue
+			}
+			limiter.Wait()
+			logrus.Infof("%d> [%s]", count, s)
 			conn.Write([]byte(s + util.CRLF))
 		}
 	}(messageQueue)
