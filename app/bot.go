@@ -33,7 +33,7 @@ func (b *Bot) Start() {
 	}
 
 	// TODO: Refactor out this rate limited channel
-	// Rate limit the channel for bot responses
+	// Create a rate limited channel to process bot responses
 	limiter := rate.New(b.Config.RateLimit, 30 * time.Second)
 	messageQueue := make(chan string, b.Config.RateLimit)
 	var count int
