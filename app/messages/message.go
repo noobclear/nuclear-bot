@@ -33,6 +33,6 @@ func NewMessage(msg string) Message {
 		}
 	}
 
-	logrus.Warnf("Unable to parse message: %s", msg)
+	logrus.Warnf("Unable to parse message: [%s]", msg)
 	return nil
 }

@@ -9,6 +9,18 @@ const (
 	ConfigFile = "config.json"
 )
 
+// Example config.json file:
+//
+//{
+//  "bots": [
+//    {
+//      "twitch_oauth_token": "oauth:<OAUTH_TOKEN>",
+//      "bot_username": "newbclear",
+//      "target_channel": "#nuclear",
+//      "rate_limit": 100 // 100 messages per 30s
+//    }
+//  ]
+//}
 type Config struct {
 	BotConfigs []BotConfig `json:"bots"`
 }

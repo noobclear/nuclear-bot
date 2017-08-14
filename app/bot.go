@@ -15,8 +15,8 @@ type Starter interface {
 }
 
 type Bot struct {
-	config.BotConfig
-	Router
+	Config config.BotConfig
+	Router Router
 }
 
 func (b *Bot) Start() {
@@ -26,11 +26,20 @@ func (b *Bot) Start() {
 	r := textproto.NewReader(bufio.NewReader(conn))
 	ctx := messages.Context{
 		Connection: conn,
-		BotUsername: b.BotUsername,
-		TargetChannel: b.TargetChannel,
+		BotUsername: b.Config.BotUsername,
+		TargetChannel: b.Config.TargetChannel,
 	}
 
-	b.listen(&ctx, r)
+	// Create a rate limited channel for bot responses
+	messageQueue := make(chan string, b.Config.RateLimit * 2)
+	go func(q <-chan string) {
+		for s := range q {
+			logrus.Infof("> [%s]", s)
+			conn.Write([]byte(s + util.CRLF))
+		}
+	}(messageQueue)
+
+	b.listen(&ctx, r, messageQueue)
 }
 
 func (b *Bot) getConnection() net.Conn {
@@ -41,15 +50,15 @@ func (b *Bot) getConnection() net.Conn {
 	}
 
 	// token, username, and channel
-	conn.Write([]byte("PASS " + b.BotConfig.TwitchOAuthToken + util.CRLF))
-	conn.Write([]byte("NICK " + b.BotConfig.BotUsername + util.CRLF))
-	conn.Write([]byte("JOIN " + b.BotConfig.TargetChannel + util.CRLF))
+	conn.Write([]byte("PASS " + b.Config.TwitchOAuthToken + util.CRLF))
+	conn.Write([]byte("NICK " + b.Config.BotUsername + util.CRLF))
+	conn.Write([]byte("JOIN " + b.Config.TargetChannel + util.CRLF))
 
-	logrus.Infof("%s joined %s", b.BotUsername, b.TargetChannel)
+	logrus.Infof("%s joined %s", b.Config.BotUsername, b.Config.TargetChannel)
 	return conn
 }
 
-func (b *Bot) listen(ctx *messages.Context, r *textproto.Reader) {
+func (b *Bot) listen(ctx *messages.Context, r *textproto.Reader, q chan<- string) {
 	for {
 		msg, err := r.ReadLine()
 		if err != nil {
@@ -57,6 +66,6 @@ func (b *Bot) listen(ctx *messages.Context, r *textproto.Reader) {
 		}
 
 		logrus.Infof("< %s", msg)
-		b.Router.Route(msg, ctx)
+		b.Router.Route(ctx, msg, q)
 	}
 }
