@@ -9,11 +9,8 @@ type IgnoreSelfHandler struct{}
 // Filters out messages from other instances of the same bot to avoid recursive messaging behavior
 func (ish *IgnoreSelfHandler) Handle(ctx *messages.Context, m messages.Message) (string, bool, error) {
 	privMessage, ok := m.(*messages.PrivMessage)
-	if ok && privMessage.FromUser == ctx.BotUsername {
-		return "", true, nil
-	} else {
-		return "", false, nil
-	}
+	fromSelf := ok && privMessage.FromUser == ctx.BotUsername
+	return "", fromSelf, nil
 }
 
 func NewIgnoreSelfHandler() Handler {
