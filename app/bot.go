@@ -2,13 +2,13 @@ package app
 
 import (
 	"bufio"
+	"github.com/beefsack/go-rate"
 	"github.com/noobclear/nuclear-bot/app/config"
 	"github.com/noobclear/nuclear-bot/app/messages"
 	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
-	"github.com/beefsack/go-rate"
 	"time"
 )
 
@@ -34,7 +34,7 @@ func (b *Bot) Start() {
 
 	// TODO: Refactor out this rate limited channel
 	// Create a rate limited channel to process bot responses
-	limiter := rate.New(b.Config.RateLimit, 30 * time.Second)
+	limiter := rate.New(b.Config.RateLimit, 30*time.Second)
 	messageQueue := make(chan string, b.Config.RateLimit)
 	var count int
 

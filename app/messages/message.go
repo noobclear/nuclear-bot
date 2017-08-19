@@ -5,16 +5,8 @@ import (
 	"strings"
 )
 
-type Message interface{}
-
-type PingMessage struct {
-	Host string
-}
-
-type PrivMessage struct {
-	FromUser  string
-	ToChannel string
-	Text      string
+type Message interface {
+	FormatResponse() string
 }
 
 func NewMessage(msg string) Message {
