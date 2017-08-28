@@ -26,11 +26,26 @@ func (bm *BotManager) StartAll() {
 
 func NewBotManager(c *config.Config) Manager {
 	var bots []Starter
-	end := h.HandlerFunc(func(*msgs.Context, msgs.Writer, msgs.Message) {})
 
 	for _, bc := range c.BotConfigs {
-		bot := Bot{bc, h.NewPingHandler(h.NewIgnoreSelfHandler(h.NewNLPHandler(end)))}
+		bot := Bot{
+			Config: bc,
+			Handler: adapt(h.NewPingHandler, h.NewIgnoreSelfHandler, h.NewNLPHandler),
+		}
 		bots = append(bots, &bot)
 	}
 	return &BotManager{bots}
+}
+
+func adapt(handlers ...func(h.Handler) h.Handler) h.Handler {
+	var curr h.Handler
+	for i := len(handlers)-1; i >= 0; i-- {
+		if curr == nil {
+			end := h.HandlerFunc(func(*msgs.Context, msgs.Writer, msgs.Message) {})
+			curr = handlers[i](end)
+		} else {
+			curr = handlers[i](curr)
+		}
+	}
+	return curr
 }
