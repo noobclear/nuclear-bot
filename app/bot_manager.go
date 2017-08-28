@@ -29,7 +29,7 @@ func NewBotManager(c *config.Config) Manager {
 
 	for _, bc := range c.BotConfigs {
 		bot := Bot{
-			Config: bc,
+			Config:  bc,
 			Handler: adapt(h.NewPingHandler, h.NewIgnoreSelfHandler, h.NewNLPHandler),
 		}
 		bots = append(bots, &bot)
@@ -39,7 +39,7 @@ func NewBotManager(c *config.Config) Manager {
 
 func adapt(handlers ...func(h.Handler) h.Handler) h.Handler {
 	var curr h.Handler
-	for i := len(handlers)-1; i >= 0; i-- {
+	for i := len(handlers) - 1; i >= 0; i-- {
 		if curr == nil {
 			end := h.HandlerFunc(func(*msgs.Context, msgs.Writer, msgs.Message) {})
 			curr = handlers[i](end)
