@@ -17,7 +17,7 @@ const (
 //      "twitch_oauth_token": "oauth:<OAUTH_TOKEN>",
 //      "bot_username": "newbclear",
 //      "target_channel": "#nuclear",
-//      "rate_limit": 100 // 100 messages per 30s
+//      "rate_limit": 100 // 100 msgs per 30s
 //    }
 //  ]
 //}

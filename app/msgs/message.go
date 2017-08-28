@@ -1,20 +1,21 @@
-package messages
+package msgs
 
 import (
-	"github.com/sirupsen/logrus"
 	"strings"
+	"errors"
+	"fmt"
 )
 
 type Message interface {
 	FormatResponse() string
 }
 
-func NewMessage(msg string) Message {
+func NewMessage(msg string) (Message, error) {
 	// msg looks like :nuclear!nuclear@nuclear.tmi.twitch.tv PRIVMSG #nuclear :some message here
 	msgParts := strings.Split(msg, " ")
 
 	if len(msgParts) > 0 && msgParts[0] == "PING" {
-		return &PingMessage{Host: msgParts[1]}
+		return &PingMessage{Host: msgParts[1]}, nil
 	} else if len(msgParts) > 3 && msgParts[1] == "PRIVMSG" {
 		return &PrivMessage{
 			// i.e. Extract "nuclear" from ":nuclear!nuclear@nuclear.tmi.twitch.tv"
@@ -22,9 +23,8 @@ func NewMessage(msg string) Message {
 			// i.e. Extract "#nuclear"
 			ToChannel: msgParts[2],
 			Text:      strings.SplitN(msg, ":", 3)[2],
-		}
+		}, nil
 	}
 
-	logrus.Warnf("Unable to parse message: [%s]", msg)
-	return nil
+	return nil, errors.New(fmt.Sprintf("Unable to parse message: [%s]", msg))
 }

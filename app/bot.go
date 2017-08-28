@@ -2,14 +2,14 @@ package app
 
 import (
 	"bufio"
-	"github.com/beefsack/go-rate"
 	"github.com/noobclear/nuclear-bot/app/config"
-	"github.com/noobclear/nuclear-bot/app/messages"
+	"github.com/noobclear/nuclear-bot/app/msgs"
 	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
-	"time"
+	"github.com/noobclear/nuclear-bot/app/handlers"
+	"github.com/noobclear/nuclear-bot/app/clients"
 )
 
 type Starter interface {
@@ -18,7 +18,7 @@ type Starter interface {
 
 type Bot struct {
 	Config config.BotConfig
-	Router Router
+	Handler handlers.Handler
 }
 
 func (b *Bot) Start() {
@@ -26,34 +26,15 @@ func (b *Bot) Start() {
 	defer conn.Close()
 
 	r := textproto.NewReader(bufio.NewReader(conn))
-	ctx := messages.Context{
-		Connection:    conn,
+	ctx := msgs.Context{
 		BotUsername:   b.Config.BotUsername,
 		TargetChannel: b.Config.TargetChannel,
+		Clients: clients.NewClients(),
 	}
 
-	// TODO: Refactor out this rate limited channel
-	// Create a rate limited channel to process bot responses
-	limiter := rate.New(b.Config.RateLimit, 30*time.Second)
-	messageQueue := make(chan string, b.Config.RateLimit)
-	var count int
+	w := msgs.NewMessageWriter(conn, b.Config.RateLimit)
 
-	go func(q <-chan string) {
-		for s := range q {
-			count++
-			ok, remaining := limiter.Try()
-			// Throw away response if user has to wait too long
-			if !ok {
-				logrus.Warnf("Rate limited skip: [%s], remaining: %v", s, remaining)
-				continue
-			}
-			limiter.Wait()
-			logrus.Infof("%d> [%s]", count, s)
-			conn.Write([]byte(s + util.CRLF))
-		}
-	}(messageQueue)
-
-	b.listen(&ctx, r, messageQueue)
+	b.start(&ctx, r, w)
 }
 
 func (b *Bot) getConnection() net.Conn {
@@ -72,14 +53,23 @@ func (b *Bot) getConnection() net.Conn {
 	return conn
 }
 
-func (b *Bot) listen(ctx *messages.Context, r *textproto.Reader, q chan<- string) {
+func (b *Bot) start(ctx *msgs.Context, r *textproto.Reader, w msgs.Writer) {
+	var lineCount uint32
+
 	for {
-		msg, err := r.ReadLine()
+		line, err := r.ReadLine()
 		if err != nil {
 			panic(err)
 		}
 
-		logrus.Infof("< %s", msg)
-		b.Router.Route(ctx, msg, q)
+		lineCount++
+		logrus.Infof("%d< [%s]", lineCount, line)
+
+		msg, err := msgs.NewMessage(line)
+		if err != nil {
+			logrus.Warn(err.Error())
+		} else {
+			b.Handler.Handle(ctx, w, msg)
+		}
 	}
 }

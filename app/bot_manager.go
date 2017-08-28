@@ -3,6 +3,8 @@ package app
 import (
 	"github.com/noobclear/nuclear-bot/app/config"
 	"sync"
+	h "github.com/noobclear/nuclear-bot/app/handlers"
+	"github.com/noobclear/nuclear-bot/app/msgs"
 )
 
 type Manager interface {
@@ -24,8 +26,10 @@ func (bm *BotManager) StartAll() {
 
 func NewBotManager(c *config.Config) Manager {
 	var bots []Starter
+	end := h.HandlerFunc(func (*msgs.Context, msgs.Writer, msgs.Message) {})
+
 	for _, bc := range c.BotConfigs {
-		bot := Bot{bc, NewMessageRouter()}
+		bot := Bot{bc, h.NewPingPongHandler(h.NewIgnoreSelfHandler(h.NewNLPHandler(end)))}
 		bots = append(bots, &bot)
 	}
 	return &BotManager{bots}
