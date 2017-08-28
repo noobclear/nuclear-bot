@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/noobclear/nuclear-bot/app/msgs"
 	"fmt"
+	"github.com/noobclear/nuclear-bot/app/msgs"
 )
 
 func NewNLPHandler(h Handler) Handler {

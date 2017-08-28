@@ -1,11 +1,11 @@
 package msgs
 
 import (
-	"net"
 	"github.com/beefsack/go-rate"
-	"time"
-	"github.com/sirupsen/logrus"
 	"github.com/noobclear/nuclear-bot/app/util"
+	"github.com/sirupsen/logrus"
+	"net"
+	"time"
 )
 
 type Writer interface {

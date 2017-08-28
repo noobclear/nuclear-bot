@@ -2,14 +2,14 @@ package app
 
 import (
 	"bufio"
+	"github.com/noobclear/nuclear-bot/app/clients"
 	"github.com/noobclear/nuclear-bot/app/config"
+	"github.com/noobclear/nuclear-bot/app/handlers"
 	"github.com/noobclear/nuclear-bot/app/msgs"
 	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
-	"github.com/noobclear/nuclear-bot/app/handlers"
-	"github.com/noobclear/nuclear-bot/app/clients"
 )
 
 type Starter interface {
@@ -17,7 +17,7 @@ type Starter interface {
 }
 
 type Bot struct {
-	Config config.BotConfig
+	Config  config.BotConfig
 	Handler handlers.Handler
 }
 
@@ -29,7 +29,7 @@ func (b *Bot) Start() {
 	ctx := msgs.Context{
 		BotUsername:   b.Config.BotUsername,
 		TargetChannel: b.Config.TargetChannel,
-		Clients: clients.NewClients(),
+		Clients:       clients.NewClients(),
 	}
 
 	w := msgs.NewMessageWriter(conn, b.Config.RateLimit)

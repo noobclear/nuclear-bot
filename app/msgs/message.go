@@ -1,9 +1,9 @@
 package msgs
 
 import (
-	"strings"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Message interface {

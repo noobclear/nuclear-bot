@@ -1,3 +1,3 @@
 package clients
 
-type WitClient struct {}
+type WitClient struct{}
