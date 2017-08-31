@@ -1,13 +1,13 @@
 package clients
 
 import (
-	"net/http"
-	"time"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
-	"encoding/json"
+	"net/http"
+	"time"
 )
 
 const (
@@ -24,13 +24,13 @@ type WitClient struct {
 }
 
 type Intent struct {
-	MsgId string `json:"msg_id"`
-	Text  string `json:"_text"`
+	MsgId    string    `json:"msg_id"`
+	Text     string    `json:"_text"`
 	Outcomes []Outcome `json:"outcomes"`
 }
 
 type Outcome struct {
-	Intent     string `json:"intent"`
+	Intent     string  `json:"intent"`
 	Confidence float32 `json:"confidence"`
 }
 
@@ -44,12 +44,12 @@ func (wc *WitClient) GetIntent(text string) (*Intent, error) {
 	}
 
 	// Create basic request with auth headers
-	req, err := http.NewRequest("GET", WitBaseUrl + "/message", nil)
+	req, err := http.NewRequest("GET", WitBaseUrl+"/message", nil)
 	if err != nil {
 		logrus.WithError(err).Errorf("Failed to create GetIntent request: %s", text)
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer " + wc.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+wc.AccessToken)
 
 	// Build query params
 	q := req.URL.Query()
@@ -90,8 +90,8 @@ func NewWitClient(accessToken string) NLPClient {
 	client := &http.Client{}
 	client.Timeout = time.Second * 5
 
-	return &WitClient {
+	return &WitClient{
 		AccessToken: accessToken,
-		HTTPClient: client,
+		HTTPClient:  client,
 	}
 }
