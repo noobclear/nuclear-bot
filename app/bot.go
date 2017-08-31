@@ -29,7 +29,7 @@ func (b *Bot) Start() {
 	ctx := msgs.Context{
 		BotUsername:   b.Config.BotUsername,
 		TargetChannel: b.Config.TargetChannel,
-		Clients:       clients.NewClients(),
+		Clients:       clients.NewClients(b.Config),
 	}
 
 	w := msgs.NewMessageWriter(conn, b.Config.RateLimit)

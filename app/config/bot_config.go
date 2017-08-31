@@ -5,4 +5,5 @@ type BotConfig struct {
 	BotUsername      string `json:"bot_username"`
 	TargetChannel    string `json:"target_channel"`
 	RateLimit        int    `json:"rate_limit"`
+	WitAccessToken   string `json:"wit_access_token"`
 }

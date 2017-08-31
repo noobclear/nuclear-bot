@@ -1,11 +1,13 @@
 package clients
 
+import "github.com/noobclear/nuclear-bot/app/config"
+
 type Clients struct {
-	Wit WitClient
+	NLP NLPClient
 }
 
-func NewClients() *Clients {
+func NewClients(c config.BotConfig) *Clients {
 	return &Clients{
-		Wit: WitClient{},
+		NLP: NewWitClient(c.WitAccessToken),
 	}
 }
