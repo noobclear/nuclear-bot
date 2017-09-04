@@ -24,8 +24,8 @@ type WitClient struct {
 }
 
 type GetIntentResponse struct {
-	Text     string    `json:"_text"`
-	Entities Entities  `json:"entities"`
+	Text     string   `json:"_text"`
+	Entities Entities `json:"entities"`
 }
 
 type Entities struct {

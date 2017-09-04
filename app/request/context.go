@@ -9,5 +9,5 @@ type Context struct {
 	BotUsername    string
 	TargetChannel  string
 	Clients        *clients.Clients
-	CommandFactory commands.Commander
+	CommandFactory commands.CommandFactory
 }

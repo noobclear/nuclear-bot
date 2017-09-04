@@ -2,7 +2,7 @@ package commands
 
 import "github.com/noobclear/nuclear-bot/app/msgs"
 
-type PCSpecsCommand struct {}
+type PCSpecsCommand struct{}
 
 func (c *PCSpecsCommand) Execute(w msgs.Writer, m msgs.PrivMessage) error {
 	// TODO: set depending on target channel

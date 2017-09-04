@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"github.com/noobclear/nuclear-bot/app/msgs"
-	"strings"
-	"github.com/sirupsen/logrus"
 	"github.com/noobclear/nuclear-bot/app/request"
+	"github.com/sirupsen/logrus"
+	"strings"
 )
 
-var KnownBots = map[string]struct{} {
+var KnownBots = map[string]struct{}{
 	"nightbot":  {},
 	"newbclear": {},
 }

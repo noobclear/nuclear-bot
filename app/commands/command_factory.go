@@ -2,15 +2,15 @@ package commands
 
 import "github.com/sirupsen/logrus"
 
-type Commander interface {
-	Command(s string) Command
+type CommandFactory interface {
+	GetCommand(s string) Command
 }
 
-type CommandFactory struct {
+type NukeCommandFactory struct {
 	Intents map[string]Command
 }
 
-func (f *CommandFactory) Command(s string) Command {
+func (f *NukeCommandFactory) GetCommand(s string) Command {
 	c, ok := f.Intents[s]
 	if ok {
 		return c
@@ -19,12 +19,11 @@ func (f *CommandFactory) Command(s string) Command {
 	return nil
 }
 
-func NewCommandFactory() Commander {
+func NewCommandFactory() CommandFactory {
 	intentMap := make(map[string]Command)
 	intentMap["get_pc_specs"] = NewPCSpecsCommand()
 
-	return &CommandFactory{
+	return &NukeCommandFactory{
 		Intents: intentMap,
 	}
 }
-

@@ -4,8 +4,8 @@ import (
 	"github.com/noobclear/nuclear-bot/app/config"
 	h "github.com/noobclear/nuclear-bot/app/handlers"
 	"github.com/noobclear/nuclear-bot/app/msgs"
-	"sync"
 	"github.com/noobclear/nuclear-bot/app/request"
+	"sync"
 )
 
 type Manager interface {
@@ -13,7 +13,7 @@ type Manager interface {
 }
 
 type BotManager struct {
-	Bots []Starter
+	Bots []Bot
 }
 
 func (bm *BotManager) StartAll() {
@@ -26,10 +26,10 @@ func (bm *BotManager) StartAll() {
 }
 
 func NewBotManager(c *config.Config) Manager {
-	var bots []Starter
+	var bots []Bot
 
 	for _, bc := range c.BotConfigs {
-		bot := Bot{
+		bot := NuclearBot{
 			Config:  bc,
 			Handler: adapt(h.NewPingHandler, h.NewIgnoreBotsHandler, h.NewCommandHandler, h.NewNLPHandler),
 		}

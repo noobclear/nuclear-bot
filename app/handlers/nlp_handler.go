@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/noobclear/nuclear-bot/app/msgs"
 	"github.com/noobclear/nuclear-bot/app/clients"
+	"github.com/noobclear/nuclear-bot/app/msgs"
 	"github.com/noobclear/nuclear-bot/app/request"
 )
 
@@ -24,7 +24,7 @@ func NewNLPHandler(h Handler) Handler {
 					}
 
 					i := extractIntent(resp)
-					c := ctx.CommandFactory.Command(i)
+					c := ctx.CommandFactory.GetCommand(i)
 					if c != nil {
 						c.Execute(w, *privMessage)
 					}

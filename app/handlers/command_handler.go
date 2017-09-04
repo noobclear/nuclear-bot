@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"github.com/noobclear/nuclear-bot/app/msgs"
+	"github.com/noobclear/nuclear-bot/app/request"
 	"github.com/sirupsen/logrus"
 	"strings"
-	"github.com/noobclear/nuclear-bot/app/request"
 )
 
-// Filters out msgs from other bots to avoid recursive messaging behavior
 func NewCommandHandler(h Handler) Handler {
 	return HandlerFunc(
 		func(ctx *request.Context, w msgs.Writer, m msgs.Message) {

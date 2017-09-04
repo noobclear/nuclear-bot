@@ -3,26 +3,26 @@ package app
 import (
 	"bufio"
 	"github.com/noobclear/nuclear-bot/app/clients"
+	"github.com/noobclear/nuclear-bot/app/commands"
 	"github.com/noobclear/nuclear-bot/app/config"
 	"github.com/noobclear/nuclear-bot/app/handlers"
 	"github.com/noobclear/nuclear-bot/app/msgs"
+	"github.com/noobclear/nuclear-bot/app/request"
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
-	"github.com/noobclear/nuclear-bot/app/request"
-	"github.com/noobclear/nuclear-bot/app/commands"
 )
 
-type Starter interface {
+type Bot interface {
 	Start()
 }
 
-type Bot struct {
+type NuclearBot struct {
 	Config  config.BotConfig
 	Handler handlers.Handler
 }
 
-func (b *Bot) Start() {
+func (b *NuclearBot) Start() {
 	conn := b.getConnection()
 	defer conn.Close()
 
@@ -38,7 +38,7 @@ func (b *Bot) Start() {
 	b.start(&ctx, r, w)
 }
 
-func (b *Bot) getConnection() net.Conn {
+func (b *NuclearBot) getConnection() net.Conn {
 	conn, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (b *Bot) getConnection() net.Conn {
 	return conn
 }
 
-func (b *Bot) start(ctx *request.Context, r *textproto.Reader, w msgs.Writer) {
+func (b *NuclearBot) start(ctx *request.Context, r *textproto.Reader, w msgs.Writer) {
 	var lineCount uint32
 
 	for {
