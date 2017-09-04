@@ -1,5 +1,9 @@
 package msgs
 
+import (
+	"fmt"
+)
+
 type PrivMessage struct {
 	FromUser  string
 	ToChannel string
@@ -7,5 +11,8 @@ type PrivMessage struct {
 }
 
 func (pm *PrivMessage) FormatResponse() string {
-	return "PRIVMSG " + pm.ToChannel + " :" + pm.Text
+	atUser := fmt.Sprintf("@%s ", pm.FromUser)
+	t := fmt.Sprintf("%s%s", atUser, pm.Text)
+
+	return "PRIVMSG " + pm.ToChannel + " :" + t
 }

@@ -2,7 +2,6 @@ package msgs
 
 import (
 	"github.com/beefsack/go-rate"
-	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/sirupsen/logrus"
 	"net"
 	"time"
@@ -39,7 +38,7 @@ func NewMessageWriter(c net.Conn, rateLimit int) Writer {
 			}
 			limiter.Wait()
 			logrus.Infof("%d> [%s]", count, s)
-			c.Write([]byte(s + util.CRLF))
+			c.Write([]byte(s + "\r\n"))
 		}
 	}(messageQueue)
 

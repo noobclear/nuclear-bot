@@ -12,6 +12,7 @@ type Message interface {
 
 func NewMessage(msg string) (Message, error) {
 	// msg looks like :nuclear!nuclear@nuclear.tmi.twitch.tv PRIVMSG #nuclear :some message here
+	msg = strings.TrimSpace(msg)
 	msgParts := strings.Split(msg, " ")
 
 	if len(msgParts) > 0 && msgParts[0] == "PING" {

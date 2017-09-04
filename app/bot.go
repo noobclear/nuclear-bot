@@ -6,10 +6,11 @@ import (
 	"github.com/noobclear/nuclear-bot/app/config"
 	"github.com/noobclear/nuclear-bot/app/handlers"
 	"github.com/noobclear/nuclear-bot/app/msgs"
-	"github.com/noobclear/nuclear-bot/app/util"
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/textproto"
+	"github.com/noobclear/nuclear-bot/app/request"
+	"github.com/noobclear/nuclear-bot/app/commands"
 )
 
 type Starter interface {
@@ -26,14 +27,14 @@ func (b *Bot) Start() {
 	defer conn.Close()
 
 	r := textproto.NewReader(bufio.NewReader(conn))
-	ctx := msgs.Context{
-		BotUsername:   b.Config.BotUsername,
-		TargetChannel: b.Config.TargetChannel,
-		Clients:       clients.NewClients(b.Config),
+	ctx := request.Context{
+		BotUsername:    b.Config.BotUsername,
+		TargetChannel:  b.Config.TargetChannel,
+		Clients:        clients.NewClients(b.Config),
+		CommandFactory: commands.NewCommandFactory(),
 	}
 
 	w := msgs.NewMessageWriter(conn, b.Config.RateLimit)
-
 	b.start(&ctx, r, w)
 }
 
@@ -45,15 +46,15 @@ func (b *Bot) getConnection() net.Conn {
 	}
 
 	// token, username, and channel
-	conn.Write([]byte("PASS " + b.Config.TwitchOAuthToken + util.CRLF))
-	conn.Write([]byte("NICK " + b.Config.BotUsername + util.CRLF))
-	conn.Write([]byte("JOIN " + b.Config.TargetChannel + util.CRLF))
+	conn.Write([]byte("PASS " + b.Config.TwitchOAuthToken + "\r\n"))
+	conn.Write([]byte("NICK " + b.Config.BotUsername + "\r\n"))
+	conn.Write([]byte("JOIN " + b.Config.TargetChannel + "\r\n"))
 
 	logrus.Infof("%s joined %s", b.Config.BotUsername, b.Config.TargetChannel)
 	return conn
 }
 
-func (b *Bot) start(ctx *msgs.Context, r *textproto.Reader, w msgs.Writer) {
+func (b *Bot) start(ctx *request.Context, r *textproto.Reader, w msgs.Writer) {
 	var lineCount uint32
 
 	for {

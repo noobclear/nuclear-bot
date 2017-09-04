@@ -15,7 +15,7 @@ const (
 )
 
 type NLPClient interface {
-	GetIntent(text string) (*Intent, error)
+	GetIntent(text string) (*GetIntentResponse, error)
 }
 
 type WitClient struct {
@@ -23,19 +23,22 @@ type WitClient struct {
 	HTTPClient  *http.Client
 }
 
-type Intent struct {
-	MsgId    string    `json:"msg_id"`
+type GetIntentResponse struct {
 	Text     string    `json:"_text"`
-	Outcomes []Outcome `json:"outcomes"`
+	Entities Entities  `json:"entities"`
 }
 
-type Outcome struct {
-	Intent     string  `json:"intent"`
-	Confidence float32 `json:"confidence"`
+type Entities struct {
+	Intents []Intent `json:"intent"`
 }
 
-func (wc *WitClient) GetIntent(text string) (*Intent, error) {
-	logrus.Infof("Retrieving intent for: [%s]", text)
+type Intent struct {
+	Confidence float64 `json:"confidence"`
+	Value      string  `json:"value"`
+}
+
+func (wc *WitClient) GetIntent(text string) (*GetIntentResponse, error) {
+	logrus.Infof("Retrieving intent for text: [%s]", text)
 	if len(text) < 2 {
 		msg := fmt.Sprintf("GetIntent text length < 2: [%s]", text)
 		err := errors.New(msg)
@@ -53,7 +56,7 @@ func (wc *WitClient) GetIntent(text string) (*Intent, error) {
 
 	// Build query params
 	q := req.URL.Query()
-	q.Add("v", "20141022")
+	q.Add("v", "20170901")
 	q.Add("q", text)
 	req.URL.RawQuery = q.Encode()
 
@@ -71,14 +74,14 @@ func (wc *WitClient) GetIntent(text string) (*Intent, error) {
 	}
 	logrus.Infof("Raw intent body resp: %s", string(body))
 
-	i := Intent{}
+	i := GetIntentResponse{}
 	err = json.Unmarshal(body, &i)
 	if err != nil {
 		logrus.WithError(err).Errorf("Failed to parse JSON GetIntent response body: %s", text)
 		return nil, err
 	}
 
-	logrus.Infof("Received intent: %+v", i)
+	logrus.Infof("Returning parsed intent: %+v", i)
 	return &i, nil
 }
 
