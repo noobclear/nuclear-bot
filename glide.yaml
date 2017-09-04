@@ -4,3 +4,7 @@ import:
   version: ^1.0.2
 - package: github.com/beefsack/go-rate
 - package: github.com/go-resty/resty
+  version: ^0.13.0
+- package: golang.org/x/net
+  subpackages:
+  - publicsuffix

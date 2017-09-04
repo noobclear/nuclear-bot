@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	conf := config.GetConfig()
-	bm := app.NewBotManager(conf)
+	c := config.GetConfig()
+	bm := app.NewBotManager(c)
 	bm.StartAll()
 }
