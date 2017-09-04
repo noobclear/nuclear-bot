@@ -3,3 +3,4 @@ import:
 - package: github.com/sirupsen/logrus
   version: ^1.0.2
 - package: github.com/beefsack/go-rate
+- package: github.com/go-resty/resty
