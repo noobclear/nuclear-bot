@@ -58,55 +58,12 @@ func (b *NuclearBot) getConnection() net.Conn {
 }
 
 func (b *NuclearBot) start(ctx *request.Context, r *textproto.Reader, w msgs.Writer) {
+	go alertNewFollowers(ctx)
+	receiveIRCChatMessages(b.Handler, ctx, r, w)
+}
+
+func receiveIRCChatMessages(h handlers.Handler, ctx *request.Context, r *textproto.Reader, w msgs.Writer) {
 	var lineCount uint32
-
-	limiter := rate.New(1, time.Second * 30)
-	// Poll for new followers
-	go func(r *rate.RateLimiter) {
-		// Get user ID from channel
-		user, err := ctx.Clients.Twitch.GetUserByLogin(ctx.TargetChannel[1:])
-		if err != nil || user == nil || user.ID == "" {
-			panic(err)
-		}
-
-		// Doesn't scale with millions of followers but definitely enough for our needs
-		followers := make(map[string]struct{})
-
-		// Build initial list of latest 100 followers
-		resp, err := ctx.Clients.Twitch.GetChannelFollows(user.ID)
-		if err != nil {
-			logrus.Warnf("Failed to get initial channel follows for %s", user.ID)
-			panic(err)
-		}
-		for _, f := range resp.Follows {
-			logrus.Infof("Adding %+v to initial followers list", f.User)
-			followers[f.User.ID] = struct{}{}
-		}
-		logrus.Infof("Added %v followers", len(followers))
-		r.Wait()
-
-		for {
-			r.Wait()
-			resp, err := ctx.Clients.Twitch.GetChannelFollows(user.ID)
-			if err != nil {
-				logrus.Warnf("Failed to get channel follows for %s, continuing...", user.ID)
-				continue
-			}
-
-			for _, f := range resp.Follows {
-				_, ok := followers[f.User.ID]
-				if !ok {
-					// Trigger new follower alert and add to list
-					logrus.Infof("New follower alert: %+v", f.User)
-					// TODO: rate limit new follower alert with channel and call streamlabs
-					ctx.Clients.Lights.TriggerPulse()
-					followers[f.User.ID] = struct{}{}
-				}
-			}
-		}
-	}(limiter)
-
-	// Start receiving Twitch chat messages
 	for {
 		line, err := r.ReadLine()
 		if err != nil {
@@ -120,7 +77,54 @@ func (b *NuclearBot) start(ctx *request.Context, r *textproto.Reader, w msgs.Wri
 		if err != nil {
 			logrus.Warn(err.Error())
 		} else {
-			b.Handler.Handle(ctx, w, msg)
+			h.Handle(ctx, w, msg)
+		}
+	}
+}
+
+func alertNewFollowers(ctx *request.Context) {
+	// Poll for new followers
+	r := rate.New(1, time.Second * 30)
+
+	// Get user ID from channel
+	user, err := ctx.Clients.Twitch.GetUserByLogin(ctx.TargetChannel[1:])
+	if err != nil || user == nil || user.ID == "" {
+		panic(err)
+	}
+
+	// Doesn't scale with millions of followers but definitely enough for our needs
+	followers := make(map[string]struct{})
+
+	// Build initial list of latest 100 followers
+	resp, err := ctx.Clients.Twitch.GetChannelFollows(user.ID)
+	if err != nil {
+		logrus.Warnf("Failed to get initial channel follows for %s", user.ID)
+		panic(err)
+	}
+	for _, f := range resp.Follows {
+		logrus.Infof("Adding %+v to initial followers list", f.User)
+		followers[f.User.ID] = struct{}{}
+	}
+	logrus.Infof("Added %v followers", len(followers))
+	r.Wait()
+
+	for {
+		r.Wait()
+		resp, err := ctx.Clients.Twitch.GetChannelFollows(user.ID)
+		if err != nil {
+			logrus.Warnf("Failed to get channel follows for %s, continuing...", user.ID)
+			continue
+		}
+
+		for _, f := range resp.Follows {
+			_, ok := followers[f.User.ID]
+			if !ok {
+				// Trigger new follower alert and add to list
+				logrus.Infof("New follower alert: %+v", f.User)
+				// TODO: rate limit new follower alert with channel and call streamlabs
+				ctx.Clients.Lights.TriggerPulse()
+				followers[f.User.ID] = struct{}{}
+			}
 		}
 	}
 }
