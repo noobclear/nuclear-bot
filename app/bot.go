@@ -26,12 +26,13 @@ func (b *NuclearBot) Start() {
 	conn := b.getConnection()
 	defer conn.Close()
 
+	clients := clients.NewClients(b.Config)
 	r := textproto.NewReader(bufio.NewReader(conn))
 	ctx := request.Context{
 		BotUsername:    b.Config.BotUsername,
 		TargetChannel:  b.Config.TargetChannel,
-		Clients:        clients.NewClients(b.Config),
-		CommandFactory: commands.NewCommandFactory(),
+		Clients:        clients,
+		CommandFactory: commands.NewCommandFactory(clients),
 	}
 
 	w := msgs.NewMessageWriter(conn, b.Config.RateLimit)
