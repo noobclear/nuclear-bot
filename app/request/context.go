@@ -7,7 +7,7 @@ import (
 
 type Context struct {
 	BotUsername    string
-	TargetChannel  string
+	TargetChannel  *clients.User
 	Clients        *clients.Clients
 	CommandFactory commands.CommandFactory
 }

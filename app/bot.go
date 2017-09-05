@@ -30,9 +30,16 @@ func (b *NuclearBot) Start() {
 
 	clients := clients.NewClients(b.Config)
 	r := textproto.NewReader(bufio.NewReader(conn))
+
+	// Get user object for target channel
+	user, err := clients.Twitch.GetUserByLogin(b.Config.TargetChannel[1:])
+	if err != nil || user == nil {
+		panic(err)
+	}
+
 	ctx := request.Context{
 		BotUsername:    b.Config.BotUsername,
-		TargetChannel:  b.Config.TargetChannel,
+		TargetChannel:  user,
 		Clients:        clients,
 		CommandFactory: commands.NewCommandFactory(clients),
 	}
@@ -86,19 +93,14 @@ func alertNewFollowers(ctx *request.Context) {
 	// Poll for new followers
 	r := rate.New(1, time.Second * 30)
 
-	// Get user ID from channel
-	user, err := ctx.Clients.Twitch.GetUserByLogin(ctx.TargetChannel[1:])
-	if err != nil || user == nil || user.ID == "" {
-		panic(err)
-	}
-
 	// Doesn't scale with millions of followers but definitely enough for our needs
 	followers := make(map[string]struct{})
 
 	// Build initial list of latest 100 followers
-	resp, err := ctx.Clients.Twitch.GetChannelFollows(user.ID)
+	r.Wait()
+	resp, err := ctx.Clients.Twitch.GetChannelFollows(ctx.TargetChannel.ID)
 	if err != nil {
-		logrus.Warnf("Failed to get initial channel follows for %s", user.ID)
+		logrus.Warnf("Failed to get initial channel follows for %s", ctx.TargetChannel.ID)
 		panic(err)
 	}
 	for _, f := range resp.Follows {
@@ -106,13 +108,12 @@ func alertNewFollowers(ctx *request.Context) {
 		followers[f.User.ID] = struct{}{}
 	}
 	logrus.Infof("Added %v followers", len(followers))
-	r.Wait()
 
 	for {
 		r.Wait()
-		resp, err := ctx.Clients.Twitch.GetChannelFollows(user.ID)
+		resp, err := ctx.Clients.Twitch.GetChannelFollows(ctx.TargetChannel.ID)
 		if err != nil {
-			logrus.Warnf("Failed to get channel follows for %s, continuing...", user.ID)
+			logrus.Warnf("Failed to get channel follows for %s, continuing...", ctx.TargetChannel.ID)
 			continue
 		}
 
