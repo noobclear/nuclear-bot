@@ -1,8 +1,10 @@
-hash: db0561d2dca9e1e199199cd16dfc5224e1b07df055eb04829731d077cdaaf88f
-updated: 2017-09-04T03:29:32.9988506-07:00
+hash: 6de253ea8c5122d60008652d0988b744a408292e2b6f5cf07696541c8f52d503
+updated: 2017-09-05T21:03:48.4675999-07:00
 imports:
 - name: github.com/beefsack/go-rate
   version: de575b104f4218f4aebdc95ba56f61f38d0dad86
+- name: github.com/gin-gonic/gin
+  version: d459835d2b077e44f7c9b453505ee29881d5d12d
 - name: github.com/go-resty/resty
   version: cf81ed0a604d373be63b4c036c6b05c06520615f
 - name: github.com/sirupsen/logrus
